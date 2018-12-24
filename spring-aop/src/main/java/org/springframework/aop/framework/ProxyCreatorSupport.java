@@ -102,6 +102,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		if (!this.active) {
 			activate();
 		}
+		// 通过AopProyFactory取得AopProxy，这个AopProxyFactory是在初始化函数种定义的，使用的是DefaultAopProxyFactory
 		return getAopProxyFactory().createAopProxy(this);
 	}
 
