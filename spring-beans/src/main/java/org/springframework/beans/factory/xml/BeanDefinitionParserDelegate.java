@@ -903,6 +903,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 取得property元素的值，也许是一个list或其他
 	 * Get the value of a property element. May be a list etc.
 	 * Also used for constructor arguments, "propertyName" being null in this case.
 	 */
@@ -929,14 +930,14 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
-		boolean hasRefAttribute = ele.hasAttribute(REF_ATTRIBUTE);
+		boolean hasRefAttribute = ele.hasAttribute(REF_ATTRIBUTE); // 判断property的属性，是ref还是value，不允许同时是ref和value
 		boolean hasValueAttribute = ele.hasAttribute(VALUE_ATTRIBUTE);
 		if ((hasRefAttribute && hasValueAttribute) ||
 				((hasRefAttribute || hasValueAttribute) && subElement != null)) {
 			error(elementName +
 					" is only allowed to contain either 'ref' attribute OR 'value' attribute OR sub-element", ele);
 		}
-
+		// 如果是ref，创建一个ref的数据对象RuntimeBeanReference，这里对象封装了ref的信息
 		if (hasRefAttribute) {
 			String refName = ele.getAttribute(REF_ATTRIBUTE);
 			if (!StringUtils.hasText(refName)) {
@@ -946,12 +947,12 @@ public class BeanDefinitionParserDelegate {
 			ref.setSource(extractSource(ele));
 			return ref;
 		}
-		else if (hasValueAttribute) {
+		else if (hasValueAttribute) { // 如果是value，创建了一个value的数据对象TypedStringValue，这个对象封装了value的信息
 			TypedStringValue valueHolder = new TypedStringValue(ele.getAttribute(VALUE_ATTRIBUTE));
 			valueHolder.setSource(extractSource(ele));
 			return valueHolder;
 		}
-		else if (subElement != null) {
+		else if (subElement != null) { // 如果还有子元素，触发对子元素的解析
 			return parsePropertySubElement(subElement, bd);
 		}
 		else {
