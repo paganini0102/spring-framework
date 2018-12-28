@@ -131,10 +131,10 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		 * loadBeanDefinitions再载入BeanDefinition的信息
 		 */
 		try {
-			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			DefaultListableBeanFactory beanFactory = createBeanFactory(); // 创建IoC容器，使用DefaultListableBeanFactory
 			beanFactory.setSerializationId(getId());
 			customizeBeanFactory(beanFactory);
-			loadBeanDefinitions(beanFactory);
+			loadBeanDefinitions(beanFactory); // 启动对BeanDefintion的载入
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
 			}
