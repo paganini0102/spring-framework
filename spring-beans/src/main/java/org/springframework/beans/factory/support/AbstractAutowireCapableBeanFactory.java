@@ -410,6 +410,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
+	/**
+	 * 对设置好的BeanPostProcessors的processBeforeInitialization回调进行依次调用的地方
+	 * @param existingBean the new bean instance
+	 * (only passed to {@link BeanPostProcessor BeanPostProcessors};
+	 * can follow the {@link #ORIGINAL_INSTANCE_SUFFIX} convention in order to
+	 * enforce the given instance to be returned, i.e. no proxies etc)
+	 * @param beanName
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
@@ -425,6 +435,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return result;
 	}
 
+	/**
+	 * 对设置好的BeanPostProcessors的processAfterInitialization回调进行依次调用的地方
+	 * @param existingBean the new bean instance
+	 * (only passed to {@link BeanPostProcessor BeanPostProcessors};
+	 * can follow the {@link #ORIGINAL_INSTANCE_SUFFIX} convention in order to
+	 * enforce the given instance to be returned, i.e. no proxies etc)
+	 * @param beanName
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
@@ -1350,9 +1370,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
-
+		// 开始进行依赖注入过程，先处理autowiring的注入
 		if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME || mbd.getResolvedAutowireMode() == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
+			// 对autowire注入的处理，根据Bean的名字或者type进行autowire的过程
 			// Add property values based on autowire by name if applicable.
 			if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME) {
 				autowireByName(beanName, mbd, bw, newPvs);
@@ -1736,12 +1757,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		else {
 			invokeAwareMethods(beanName, bean);
 		}
-
+		// 对后置处理器BeanPostProcessors的postProcessBeforeInitialization的回调方法的回调
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
-
+		/**
+		 * 调用Bean的初始化方法，这个初始化方法是在BeanDefinition中通过定义init-method属性指定的同时，
+		 * 如果Bean实现了InitializingBean接口，那么这个Bean的afterPropertiesSet实现也会被调用
+		 */
 		try {
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
@@ -1750,6 +1774,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					(mbd != null ? mbd.getResourceDescription() : null),
 					beanName, "Invocation of init method failed", ex);
 		}
+		// 对后置处理器BeanPostProcessors的postProcessAfterInitialization的回调方法的回调
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
