@@ -241,7 +241,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		final String beanName = transformedBeanName(name);
 		Object bean;
-
+		// 先从缓存中取得Bean，处理那些已经被创建过的单件模式的Bean，对这种Bean的请求不需要重复的创建
 		// Eagerly check singleton cache for manually registered singletons.
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
@@ -254,6 +254,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
+			// 完成FactoryBean的相关处理，以取得FactoryBean的生产结果
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
@@ -264,6 +265,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
+			/**
+			 * 对IoC容器中的BeanDefintion是否存在进行检查，检查是否能在当前的BeanFactory中取得需要的Bean。如果在当前的工厂中娶不到，则到双亲BeanFactory中去取
+			 * 如果当前的双亲工厂取不到，那就顺着双亲BeanFactory链一直向上查找
+ 			 */
 			// Check if bean definition exists in this factory.
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
@@ -291,7 +296,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			try {
-				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName); // 根据Bean的名字取到BeanDefinition
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.

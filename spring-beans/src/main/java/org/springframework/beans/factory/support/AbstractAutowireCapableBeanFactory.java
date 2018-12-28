@@ -1705,6 +1705,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
+	 * Bean实例的创建
+	 * 为Bean实例设置属性
+	 * 调用Bean的初始化方法
+	 * 应用可以通过IoC容器使用Bean
+	 * 当容器关闭时，调用Bean的销毁方法
 	 * Initialize the given bean instance, applying factory callbacks
 	 * as well as init methods and bean post processors.
 	 * <p>Called from {@link #createBean} for traditionally defined beans,
@@ -1770,6 +1775,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 对应的初始处理可以在InitializingBean接口的afterPropertiesSet方法中实现，这里同样对Bean的一个回调
 	 * Give a bean a chance to react now all its properties are set,
 	 * and a chance to know about its owning bean factory (this object).
 	 * This means checking whether the bean implements InitializingBean or defines
@@ -1816,6 +1822,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 判断Bean是否配置有initMethod，如果有，那么通过invokeCustomInitMethod方法呢直接调用，最终完成Bean的初始化
 	 * Invoke the specified custom init method on the given bean.
 	 * Called by invokeInitMethods.
 	 * <p>Can be overridden in subclasses for custom resolution of init
