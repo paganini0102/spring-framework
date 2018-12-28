@@ -122,10 +122,14 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		if (hasBeanFactory()) {
+		if (hasBeanFactory()) { // 如果已经建立了BeanFactory，则销毁并关闭该Bean Factory
 			destroyBeans();
 			closeBeanFactory();
 		}
+		/**
+		 * 创建并设置持有的DefaultListableBeanFactory的地方同时调用
+		 * loadBeanDefinitions再载入BeanDefinition的信息
+		 */
 		try {
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			beanFactory.setSerializationId(getId());
@@ -231,6 +235,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
+	 * 使用BeanDefinitionReader载入Bean定义的地方，因为允许有多种载入方式，
+	 * 用的最多的是XML定义形式，通过一个抽象函数把具体的实现委托给子类完成
 	 * Load bean definitions into the given bean factory, typically through
 	 * delegating to one or more bean definition readers.
 	 * @param beanFactory the bean factory to load bean definitions into

@@ -31,7 +31,7 @@ public final class GlobalAdvisorAdapterRegistry {
 
 
 	/**
-	 * Keep track of a single instance so we can return it to classes that request it.
+	 * Keep track of a single instance so we can return it to classes that request it.default
 	 */
 	private static AdvisorAdapterRegistry instance = new DefaultAdvisorAdapterRegistry();
 
