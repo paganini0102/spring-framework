@@ -279,9 +279,9 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			final InvocationCallback invocation) throws Throwable {
 
 		// If the transaction attribute is null, the method is non-transactional.
-		TransactionAttributeSource tas = getTransactionAttributeSource();
+		TransactionAttributeSource tas = getTransactionAttributeSource(); // 读取事务方法调用的事务配置属性
 		final TransactionAttribute txAttr = (tas != null ? tas.getTransactionAttribute(method, targetClass) : null);
-		final PlatformTransactionManager tm = determineTransactionManager(txAttr);
+		final PlatformTransactionManager tm = determineTransactionManager(txAttr); // 确定使用PlatformTransactionManager
 		final String joinpointIdentification = methodIdentification(method, targetClass, txAttr);
 
 		if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) {
@@ -457,7 +457,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	@SuppressWarnings("serial")
 	protected TransactionInfo createTransactionIfNecessary(@Nullable PlatformTransactionManager tm,
 			@Nullable TransactionAttribute txAttr, final String joinpointIdentification) {
-
+		// 如果没有指定名字，使用方法特征来作为事务名
 		// If no name specified, apply method identification as transaction name.
 		if (txAttr != null && txAttr.getName() == null) {
 			txAttr = new DelegatingTransactionAttribute(txAttr) {
@@ -468,9 +468,14 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			};
 		}
 
-		TransactionStatus status = null;
+		TransactionStatus status = null; // 封装了事务执行的状态信息
 		if (txAttr != null) {
 			if (tm != null) {
+				/**
+				 * 使用了定义好的事务方法的配置信息
+				 * 事务创建由事务处理器来完成，同时返回TransactionStatus来记录当前的事务状态，
+				 * 包括已经创建的事务
+				 */
 				status = tm.getTransaction(txAttr);
 			}
 			else {
@@ -480,7 +485,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				}
 			}
 		}
-		return prepareTransactionInfo(tm, txAttr, joinpointIdentification, status);
+		return prepareTransactionInfo(tm, txAttr, joinpointIdentification, status); // 准备TransactionInfo，TransactionInfo对象封装了事务处理的配置信息以及TransactionStatus
 	}
 
 	/**

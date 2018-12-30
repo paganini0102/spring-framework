@@ -339,26 +339,30 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	@Override
 	public final TransactionStatus getTransaction(@Nullable TransactionDefinition definition) throws TransactionException {
-		Object transaction = doGetTransaction();
+		Object transaction = doGetTransaction(); // Transaction对象的取得由具体的事务处理器实现，比如DataSourceTransactionManager
 
 		// Cache debug flag to avoid repeated checks.
-		boolean debugEnabled = logger.isDebugEnabled();
+		boolean debugEnabled = logger.isDebugEnabled(); // 缓存debug标志位
 
 		if (definition == null) {
 			// Use defaults if no transaction definition given.
-			definition = new DefaultTransactionDefinition();
+			definition = new DefaultTransactionDefinition(); // 如果没有给定任何事务处理定义就使用默认定义
 		}
-
+		// 检查当前线程是否已经存在事务，如果已经存在事务，那么需要根据在事务属性中定义的事务传播属性配置来处理事务的产生
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
-			return handleExistingTransaction(definition, transaction, debugEnabled);
+			return handleExistingTransaction(definition, transaction, debugEnabled); // 对当前线程中已经有事务存在的情况进行处理，结果封装在TransactionStatus中
 		}
 
 		// Check definition settings for new transaction.
-		if (definition.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
+		if (definition.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) { // 检查事务属性中timeout的设置是否合理
 			throw new InvalidTimeoutException("Invalid transaction timeout", definition.getTimeout());
 		}
-
+		/**
+		 * 当前没有事务存在，这时需要根据事务属性设置来创建事务
+		 * 这里可以看到事务传播属性设置的处理，比如mandatory、required、required_new、nested等
+		 * 这里的处理对理解这些属性的使用是非常有帮助的
+		 */
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
 			throw new IllegalTransactionStateException(
@@ -373,9 +377,14 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			}
 			try {
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
+				/**
+				 * 返回TransactionStatus封装事务执行情况
+				 * 默认getTransactionSynchronization=SYNCHRONIZATION_ALWAYS
+				 * 所以在这种情况下，newSynchronization为true
+				 */
 				DefaultTransactionStatus status = newTransactionStatus(
 						definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
-				doBegin(transaction, definition);
+				doBegin(transaction, definition); // 创建事务的调用，由具体的事务处理器来完成，比如HibernateTransactionManager和DataSourceTransactionManager等
 				prepareSynchronization(status, definition);
 				return status;
 			}
@@ -390,6 +399,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				logger.warn("Custom isolation level specified but no actual transaction initiated; " +
 						"isolation level will effectively be ignored: " + definition);
 			}
+			// TransationStatus没有transaction对象，因为在newTransactionStatus中对应于transaction的参数是null
 			boolean newSynchronization = (getTransactionSynchronization() == SYNCHRONIZATION_ALWAYS);
 			return prepareTransactionStatus(definition, null, true, newSynchronization, debugEnabled, null);
 		}
@@ -517,7 +527,11 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	protected DefaultTransactionStatus newTransactionStatus(
 			TransactionDefinition definition, @Nullable Object transaction, boolean newTransaction,
 			boolean newSynchronization, boolean debug, @Nullable Object suspendedResources) {
-
+		/**
+		 * 判断是不是新事务，如果是新事务，那么需要把事务属性存放到当前线程中
+		 * TransactionSynchronizationManager维护一系列的ThreadLocal变量来保持
+		 * 事务属性，比如并发事务隔离级别，是否有活跃的事务等
+		 */
 		boolean actualNewSynchronization = newSynchronization &&
 				!TransactionSynchronizationManager.isSynchronizationActive();
 		return new DefaultTransactionStatus(
