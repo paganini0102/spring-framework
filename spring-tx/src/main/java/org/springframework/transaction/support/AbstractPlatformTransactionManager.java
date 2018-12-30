@@ -756,7 +756,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 			try {
 				boolean unexpectedRollback = false;
-				prepareForCommit(status);
+				prepareForCommit(status); // 事务提交的准备工作由具体的事务处理器来完成
 				triggerBeforeCommit(status);
 				triggerBeforeCompletion(status);
 				beforeCompletionInvoked = true;
