@@ -65,6 +65,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	}
 
 	/**
+	 * 设置配置事务方法
 	 * Parses the given properties into a name/attribute map.
 	 * Expects method names as keys and String attributes definitions as values,
 	 * parsable into TransactionAttribute instances via TransactionAttributeEditor.
@@ -98,17 +99,25 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	}
 
 
+	/**
+	 * 对调用的方法进行判断，判断是否是事务方法，如果是事务方法，那么取出的事务配置属性
+	 * @param method the method to introspect
+	 * @param targetClass the target class (may be {@code null},
+	 * in which case the declaring class of the method must be used)
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
 		if (!ClassUtils.isUserLevelMethod(method)) {
 			return null;
 		}
-
+		// 判断当前目标调用的方法与配置的事务方法是否直接匹配
 		// Look for direct name match.
 		String methodName = method.getName();
 		TransactionAttribute attr = this.nameMap.get(methodName);
 
+		// 如果不能直接匹配，就通过调用PatternMatchUtils的simpleMatch方法来进行匹配判断
 		if (attr == null) {
 			// Look for most specific name match.
 			String bestNameMatch = null;
@@ -125,6 +134,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	}
 
 	/**
+	 * 事务方法的匹配判断
 	 * Return if the given method name matches the mapped name.
 	 * <p>The default implementation checks for "xxx*", "*xxx" and "*xxx*" matches,
 	 * as well as direct equality. Can be overridden in subclasses.
