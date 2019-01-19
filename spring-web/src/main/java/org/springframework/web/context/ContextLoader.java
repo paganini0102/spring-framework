@@ -247,6 +247,7 @@ public class ContextLoader {
 
 
 	/**
+	 * 开始对WebApplicationContext进行初始化
 	 * Initialize Spring's web application context for the given servlet context,
 	 * using the application context provided at construction time, or creating a new one
 	 * according to the "{@link #CONTEXT_CLASS_PARAM contextClass}" and
@@ -285,7 +286,7 @@ public class ContextLoader {
 					if (cwac.getParent() == null) {
 						// The context instance was injected without an explicit parent ->
 						// determine parent for root web application context, if any.
-						ApplicationContext parent = loadParentContext(servletContext);
+						ApplicationContext parent = loadParentContext(servletContext); // 载入根上下文的双亲上下文
 						cwac.setParent(parent);
 					}
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
@@ -328,11 +329,12 @@ public class ContextLoader {
 	 * @see ConfigurableWebApplicationContext
 	 */
 	protected WebApplicationContext createWebApplicationContext(ServletContext sc) {
-		Class<?> contextClass = determineContextClass(sc);
+		Class<?> contextClass = determineContextClass(sc); // 判断使用什么样的类在Web容器中作为IoC容器
 		if (!ConfigurableWebApplicationContext.class.isAssignableFrom(contextClass)) {
 			throw new ApplicationContextException("Custom context class [" + contextClass.getName() +
 					"] is not of type [" + ConfigurableWebApplicationContext.class.getName() + "]");
 		}
+		// 直接实例化需要产生的IoC容器，并设置IoC容器的各个参数，然后通过refresh启动容器的初始化
 		return (ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 	}
 
@@ -382,7 +384,7 @@ public class ContextLoader {
 			}
 		}
 
-		wac.setServletContext(sc);
+		wac.setServletContext(sc); // 设置ServletContext以及配置文件的位置参数
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
 			wac.setConfigLocation(configLocationParam);
@@ -397,7 +399,7 @@ public class ContextLoader {
 		}
 
 		customizeContext(sc, wac);
-		wac.refresh();
+		wac.refresh(); //启动容器的初始化
 	}
 
 	/**
