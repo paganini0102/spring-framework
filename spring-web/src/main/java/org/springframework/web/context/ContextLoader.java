@@ -347,8 +347,8 @@ public class ContextLoader {
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext
 	 */
 	protected Class<?> determineContextClass(ServletContext servletContext) {
-		String contextClassName = servletContext.getInitParameter(CONTEXT_CLASS_PARAM);
-		if (contextClassName != null) {
+		String contextClassName = servletContext.getInitParameter(CONTEXT_CLASS_PARAM); // 读取在ServeletContext中对CONTEXT_CLASS_PARAM参数的配置
+		if (contextClassName != null) { // 前提是这个class为可用的
 			try {
 				return ClassUtils.forName(contextClassName, ClassUtils.getDefaultClassLoader());
 			}
@@ -357,7 +357,7 @@ public class ContextLoader {
 						"Failed to load custom context class [" + contextClassName + "]", ex);
 			}
 		}
-		else {
+		else { // 如果没有额外的配置，使用默认的ContextClass
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {
 				return ClassUtils.forName(contextClassName, ContextLoader.class.getClassLoader());
