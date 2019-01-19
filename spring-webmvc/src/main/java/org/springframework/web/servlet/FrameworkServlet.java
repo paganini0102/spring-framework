@@ -525,6 +525,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 		long startTime = System.currentTimeMillis();
 
+		// 初始化上下文
 		try {
 			this.webApplicationContext = initWebApplicationContext();
 			initFrameworkServlet();
@@ -598,7 +599,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 				onRefresh(wac);
 			}
 		}
-
+		// 把当前建立的上下文存到ServletContext中去，这里使用的属性名是和当前Servlet名相关的
 		if (this.publishContext) {
 			// Publish the context as a servlet context attribute.
 			String attrName = getServletContextAttributeName();
@@ -655,6 +656,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 					"': custom WebApplicationContext class [" + contextClass.getName() +
 					"] is not of type ConfigurableWebApplicationContext");
 		}
+		// 实例化需要的具体上下文对象，并为这个上下文对象设置属性
 		ConfigurableWebApplicationContext wac =
 				(ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 
