@@ -923,6 +923,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// 对HTTP请求参数进行快照处理
 		// Make framework objects available to handlers and view objects.
 		request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
 		request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
@@ -939,7 +940,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		try {
-			doDispatch(request, response);
+			doDispatch(request, response); // 分发请求的入口
 		}
 		finally {
 			if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
@@ -1001,7 +1002,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		boolean multipartRequestParsed = false;
 
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
-
+		// 为视图准备好一个ModelAndView，这个ModelAndView持有handler处理请求的结果
 		try {
 			ModelAndView mv = null;
 			Exception dispatchException = null;
@@ -1011,14 +1012,14 @@ public class DispatcherServlet extends FrameworkServlet {
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
-				mappedHandler = getHandler(processedRequest);
+				mappedHandler = getHandler(processedRequest); // 根据请求得到对应的handler，handler的注册以及getHandler的实现
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
 				// Determine handler adapter for the current request.
-				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler()); // handler处理的结果封装到ModelAndView对象中，为视图提供展现数据
 
 				// Process last-modified header, if supported by the handler.
 				String method = request.getMethod();
@@ -1035,7 +1036,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Actually invoke the handler.
-				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+				mv = ha.handle(processedRequest, response, mappedHandler.getHandler()); // 通过调用HandlerAdapter的handle方法，实际上触发对Controller的handleRequest方法的调用
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
@@ -1078,6 +1079,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 判断是否需要进行视图名的翻译和转换
 	 * Do we need view name translation?
 	 */
 	private void applyDefaultViewName(HttpServletRequest request, @Nullable ModelAndView mv) throws Exception {
@@ -1227,6 +1229,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		if (this.handlerMappings != null) {
+			// 从HandlerMapping中获取handler的调用
 			for (HandlerMapping mapping : this.handlerMappings) {
 				HandlerExecutionChain handler = mapping.getHandler(request);
 				if (handler != null) {
@@ -1263,6 +1266,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	protected HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
 		if (this.handlerAdapters != null) {
+			// 对持有的所有adapter进行匹配
 			for (HandlerAdapter adapter : this.handlerAdapters) {
 				if (adapter.supports(handler)) {
 					return adapter;

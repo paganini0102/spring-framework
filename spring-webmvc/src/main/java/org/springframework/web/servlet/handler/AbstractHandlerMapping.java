@@ -399,6 +399,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		Object handler = getHandlerInternal(request);
+		// 使用默认的Handler，也就是“/”对应的handler
 		if (handler == null) {
 			handler = getDefaultHandler();
 		}
@@ -406,12 +407,12 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			return null;
 		}
 		// Bean name or resolved handler?
-		if (handler instanceof String) {
+		if (handler instanceof String) { // 通过名称取出对应的Handler Bean
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
-		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
+		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request); // 把Handler封装到HandlerExecutionChain中并加上拦截器
 
 		if (logger.isTraceEnabled()) {
 			logger.trace("Mapped to " + handler);
