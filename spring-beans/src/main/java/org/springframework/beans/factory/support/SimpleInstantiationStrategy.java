@@ -57,6 +57,15 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
 
 
+	/**
+	 * 通过bean方法是否有跟IOC容器同名的（会被覆盖）来分两类处理（没同名方法的从BeanDefinition中拿出class直接用jdk的反射拿构造器来newinstance一个实例，如果有同名的则是用CGLIB的方式来new一个实例）。
+	 * @param bd the bean definition
+	 * @param beanName the name of the bean when it is created in this context.
+	 * The name can be {@code null} if we are autowiring a bean which doesn't
+	 * belong to the factory.
+	 * @param owner the owning BeanFactory
+	 * @return
+	 */
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
