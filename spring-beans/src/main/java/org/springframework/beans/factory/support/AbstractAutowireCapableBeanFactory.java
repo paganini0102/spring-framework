@@ -1181,7 +1181,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// No special handling: simply use no-arg constructor.
-		return instantiateBean(beanName, mbd);
+		return instantiateBean(beanName, mbd); // 使用默认的构造函数对Bean进行实例化
 	}
 
 	/**
@@ -1270,6 +1270,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @return a BeanWrapper for the new instance
 	 */
 	protected BeanWrapper instantiateBean(final String beanName, final RootBeanDefinition mbd) {
+		/**
+		 * 使用默认的实例化策略对Bean进行实例化，默认的实例化策略是CglibSubclassingInstantiationStrategy,
+		 * 也就是使用CGLIB来对Bean进行实例化
+		 */
 		try {
 			Object beanInstance;
 			final BeanFactory parent = this;
