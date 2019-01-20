@@ -126,7 +126,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 			// We need to care for the default handler directly, since we need to
 			// expose the PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE for it as well.
 			Object rawHandler = null;
-			if ("/".equals(lookupPath)) {
+			if ("/".equals(lookupPath)) { // 默认handler的处理
 				rawHandler = getRootHandler();
 			}
 			if (rawHandler == null) {
@@ -146,6 +146,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	}
 
 	/**
+	 * lookupHandler根据URL路径启动在handlerMap中对handlerMap中对handler的检索，并最终返回handler对象
 	 * Look up a handler instance for the given URL path.
 	 * <p>Supports direct matches, e.g. a registered "/test" matches "/test",
 	 * and various Ant-style pattern matches, e.g. a registered "/t*" matches

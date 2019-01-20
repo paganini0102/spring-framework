@@ -41,7 +41,7 @@ public class SimpleControllerHandlerAdapter implements HandlerAdapter {
 
 	@Override
 	public boolean supports(Object handler) {
-		return (handler instanceof Controller);
+		return (handler instanceof Controller); // 判断将要调用的handler是不是Controller
 	}
 
 	@Override
