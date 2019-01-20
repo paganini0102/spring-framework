@@ -1341,22 +1341,22 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected void render(ModelAndView mv, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// Determine locale for request and apply it to the response.
 		Locale locale =
-				(this.localeResolver != null ? this.localeResolver.resolveLocale(request) : request.getLocale());
+				(this.localeResolver != null ? this.localeResolver.resolveLocale(request) : request.getLocale()); // 从request中读取locale信息，并设置response的locale值
 		response.setLocale(locale);
 
 		View view;
 		String viewName = mv.getViewName();
 		if (viewName != null) {
 			// We need to resolve the view name.
-			view = resolveViewName(viewName, mv.getModelInternal(), locale, request);
+			view = resolveViewName(viewName, mv.getModelInternal(), locale, request); // 需要对视图名进行解析
 			if (view == null) {
 				throw new ServletException("Could not resolve view with name '" + mv.getViewName() +
 						"' in servlet with name '" + getServletName() + "'");
 			}
-		}
+		} // ModelAndView中可能已经直接包含了View对象，就可以直接使用
 		else {
 			// No need to lookup: the ModelAndView object contains the actual View object.
-			view = mv.getView();
+			view = mv.getView(); // 直接从ModelAndView对象中取得实际的视图对象
 			if (view == null) {
 				throw new ServletException("ModelAndView [" + mv + "] neither contains a view name nor a " +
 						"View object in servlet with name '" + getServletName() + "'");
@@ -1371,7 +1371,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (mv.getStatus() != null) {
 				response.setStatus(mv.getStatus().value());
 			}
-			view.render(mv.getModelInternal(), request, response);
+			view.render(mv.getModelInternal(), request, response); // 调用view实现对数据进行呈现，并通过HttpResponse把视图呈现给HTTP客户端
 		}
 		catch (Exception ex) {
 			if (logger.isDebugEnabled()) {
