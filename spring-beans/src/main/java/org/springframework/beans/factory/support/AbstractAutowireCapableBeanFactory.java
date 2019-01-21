@@ -1615,6 +1615,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 对属性进行解析然后注入
 	 * Apply the given property values, resolving any runtime references
 	 * to other beans in this bean factory. Must use deep copy, so we
 	 * don't permanently modify this property.
@@ -1661,7 +1662,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this, beanName, mbd, converter);
 
 		// Create a deep copy, resolving any references for values.
-		List<PropertyValue> deepCopy = new ArrayList<>(original.size());
+		List<PropertyValue> deepCopy = new ArrayList<>(original.size()); // 为解析值创建一个副本，副本的数据会被注入到Bean中
 		boolean resolveNecessary = false;
 		for (PropertyValue pv : original) {
 			if (pv.isConverted()) {
@@ -1703,7 +1704,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
-			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
+			bw.setPropertyValues(new MutablePropertyValues(deepCopy)); // 依赖注入的地方，会在BeanWrapperImpl完成
 		}
 		catch (BeansException ex) {
 			throw new BeanCreationException(
