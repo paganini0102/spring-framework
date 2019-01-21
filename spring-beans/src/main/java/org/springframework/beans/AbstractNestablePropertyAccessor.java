@@ -290,7 +290,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		Assert.state(tokens.keys != null, "No token keys");
 		String lastKey = tokens.keys[tokens.keys.length - 1];
 
-		if (propValue.getClass().isArray()) {
+		if (propValue.getClass().isArray()) { // 对Array进行注入
 			Class<?> requiredType = propValue.getClass().getComponentType();
 			int arrayIndex = Integer.parseInt(lastKey);
 			Object oldValue = null;
@@ -316,7 +316,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			}
 		}
 
-		else if (propValue instanceof List) {
+		else if (propValue instanceof List) { // 对List进行注入
 			Class<?> requiredType = ph.getCollectionType(tokens.keys.length);
 			List<Object> list = (List<Object>) propValue;
 			int index = Integer.parseInt(lastKey);
@@ -352,7 +352,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			}
 		}
 
-		else if (propValue instanceof Map) {
+		else if (propValue instanceof Map) { // 对Map进行注入
 			Class<?> mapKeyType = ph.getMapKeyType(tokens.keys.length);
 			Class<?> mapValueType = ph.getMapValueType(tokens.keys.length);
 			Map<Object, Object> map = (Map<Object, Object>) propValue;

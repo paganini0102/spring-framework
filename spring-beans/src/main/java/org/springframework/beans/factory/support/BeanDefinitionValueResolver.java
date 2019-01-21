@@ -365,7 +365,7 @@ class BeanDefinitionValueResolver {
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
 			else {
-				bean = this.beanFactory.getBean(refName);
+				bean = this.beanFactory.getBean(refName); // 在当前IoC容器中取得Bean，还会触发一个getBean的过程，如果依赖注入没有发生，会触发相应的依赖注入的发生
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 			}
 			if (bean instanceof NullBean) {
@@ -398,7 +398,7 @@ class BeanDefinitionValueResolver {
 	 */
 	private List<?> resolveManagedList(Object argName, List<?> ml) {
 		List<Object> resolved = new ArrayList<>(ml.size());
-		for (int i = 0; i < ml.size(); i++) {
+		for (int i = 0; i < ml.size(); i++) { // 通过递归的方式，对List元素进行解析
 			resolved.add(
 					resolveValueIfNecessary(new KeyedArgName(argName, i), ml.get(i)));
 		}
