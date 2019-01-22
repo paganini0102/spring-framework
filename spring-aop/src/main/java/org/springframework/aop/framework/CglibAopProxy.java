@@ -177,8 +177,9 @@ class CglibAopProxy implements AopProxy, Serializable {
 			// Validate the class, writing log messages as necessary.
 			validateClassIfNecessary(proxySuperClass, classLoader);
 
+			// 验证代理对象的接口设置
 			// Configure CGLIB Enhancer...
-			Enhancer enhancer = createEnhancer();
+			Enhancer enhancer = createEnhancer(); // 创建并配置CGLIB的Enhancer，Enhancer对象是CGLIB的主要操作
 			if (classLoader != null) {
 				enhancer.setClassLoader(classLoader);
 				if (classLoader instanceof SmartClassLoader &&
@@ -186,7 +187,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 					enhancer.setUseCache(false);
 				}
 			}
-			enhancer.setSuperclass(proxySuperClass);
+			enhancer.setSuperclass(proxySuperClass); // 设置Enhancer对象，包括设置代理接口，回调方法
 			enhancer.setInterfaces(AopProxyUtils.completeProxiedInterfaces(this.advised));
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			enhancer.setStrategy(new ClassLoaderAwareUndeclaredThrowableStrategy(classLoader));
